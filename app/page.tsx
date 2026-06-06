@@ -6,20 +6,33 @@ import { useState } from "react";
 export default function Home() {
   const [url, setUrl] = useState("");
   const [audit, setAudit] = useState<AuditResult | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function handleAnalyze() {
-    const response = await fetch("/api/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ url }),
-    });
 
-    const data = await response.json();
+    setLoading(true);
 
-    setAudit(data);
-  }
+    try {
+
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      const data : AuditResult = await response.json();
+
+      setAudit(data);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+}
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center gap-4 p-8">
@@ -36,11 +49,14 @@ export default function Home() {
       />
 
       <button
-        onClick={handleAnalyze}
+        onClick={handleAnalyze} 
+        disabled={loading}
         className="bg-black text-white px-4 py-2 rounded"
       >
-        Analyze
+        {loading ? "Analyzing..." : "Analyze"}
       </button>
+
+      
 
       {audit && (
         <div className="border rounded p-6 w-full max-w-3xl space-y-6">
