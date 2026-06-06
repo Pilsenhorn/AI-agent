@@ -1,10 +1,11 @@
 "use client";
+import { AuditResult } from "@/types/audit";
 
 import { useState } from "react";
 
 export default function Home() {
   const [url, setUrl] = useState("");
-  const [result, setResult] = useState("");
+  const [audit, setAudit] = useState<AuditResult | null>(null);
 
   async function handleAnalyze() {
     const response = await fetch("/api/analyze", {
@@ -17,7 +18,7 @@ export default function Home() {
 
     const data = await response.json();
 
-    setResult(JSON.stringify(data, null, 2));
+    setAudit(data);
   }
 
   return (
@@ -41,9 +42,81 @@ export default function Home() {
         Analyze
       </button>
 
-      {result && (
-        <div className="border p-4 rounded w-full max-w-xl">
-          {result}
+      {audit && (
+        <div className="border rounded p-6 w-full max-w-3xl space-y-6">
+
+          <div>
+            <h2 className="text-2xl font-bold">
+              Score: {audit.overallScore}/100
+            </h2>
+          </div>
+
+          <div>
+            <h3 className="font-bold">
+              Summary
+            </h3>
+
+            <p>{audit.summary}</p>
+          </div>
+
+          <div>
+            <h3 className="font-bold">
+              Strengths
+            </h3>
+
+            <ul className="list-disc pl-6">
+              {audit.strengths.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-bold">
+              Weaknesses
+            </h3>
+
+            <ul className="list-disc pl-6">
+              {audit.weaknesses.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-bold">
+              Opportunities
+            </h3>
+
+            <ul className="list-disc pl-6">
+              {audit.opportunities.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-bold">
+              Quick Wins
+            </h3>
+            
+            <ul className="list-disc pl-6">
+              {audit.quickWins.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-bold">
+              Personalization
+            </h3>
+
+            <p>{audit.personalization}</p>
+          </div>
+          <div>
+            <h3 className="font-bold">
+              Email Draft
+            </h3>
+            <p>{audit.emailDraft}</p>
+          </div>
         </div>
       )}
     </main>

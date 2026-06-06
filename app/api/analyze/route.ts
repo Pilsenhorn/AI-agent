@@ -1,19 +1,16 @@
-import FirecrawlApp from "@mendable/firecrawl-js";
 import { NextResponse } from "next/server";
-
-const firecrawl = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_API_KEY!,
-});
+import { scrapeWebsite } from "@/services/firecrawl";
+import { auditWebsite } from "@/services/websiteAuditor.ts";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const result = await firecrawl.scrapeUrl(body.url, {
-      formats: ["markdown"],
-    });
+    const scraped = await scrapeWebsite(body.url);
+    const audit = await auditWebsite(scraped);
 
-    return NextResponse.json(result);
+
+    return NextResponse.json(audit);
   } catch (error) {
     console.error(error);
 
